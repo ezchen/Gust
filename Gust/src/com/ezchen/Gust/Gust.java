@@ -1,6 +1,6 @@
 package com.ezchen.Gust;
 
-import com.badlogic.gdx.ApplicationListener;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,58 +9,74 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.ezchen.Gust.handlers.GameStateManager;
 
-public class Gust implements ApplicationListener {
+public class Gust extends Game {
+	
+	public static final String VERSION = "0.0.1";
+	public static final String TITLE = "Gust";
+	
+	public static final float STEP = 1 / 60f;
+	private float accum;
+	
+	private GameStateManager gsm;
 	private OrthographicCamera camera;
+	private OrthographicCamera hudCam;
 	private SpriteBatch batch;
 	private Texture texture;
 	private Sprite sprite;
 	
+	public SpriteBatch getSpriteBatch() {
+		return batch;
+	}
+	
+	public OrthographicCamera getCamera() {
+		return camera;
+	}
+	
+	public OrthographicCamera getHudCam() {
+		return hudCam;
+	}
+	
 	@Override
 	public void create() {		
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-		
-		camera = new OrthographicCamera(1, h/w);
 		batch = new SpriteBatch();
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, 320, 240);
+		hudCam = new OrthographicCamera();
+		hudCam.setToOrtho(false, 320, 240);
 		
-		texture = new Texture(Gdx.files.internal("data/libgdx.png"));
-		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		
-		TextureRegion region = new TextureRegion(texture, 0, 0, 512, 275);
-		
-		sprite = new Sprite(region);
-		sprite.setSize(0.9f, 0.9f * sprite.getHeight() / sprite.getWidth());
-		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
-		sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
+		gsm = new GameStateManager(this);
 	}
 
 	@Override
 	public void dispose() {
-		batch.dispose();
-		texture.dispose();
+		super.dispose();
 	}
 
 	@Override
 	public void render() {		
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		accum += Gdx.graphics.getDeltaTime();
 		
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		sprite.draw(batch);
-		batch.end();
+		while(accum >= STEP) {
+			accum -= STEP;
+			gsm.update(STEP);
+			gsm.render();
+		}
 	}
 
 	@Override
 	public void resize(int width, int height) {
+		super.resize(width, height);
 	}
 
 	@Override
 	public void pause() {
+		super.pause();
 	}
 
 	@Override
 	public void resume() {
+		super.resume();
 	}
 }
