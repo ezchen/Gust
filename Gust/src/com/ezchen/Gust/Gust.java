@@ -15,6 +15,9 @@ public class Gust extends Game {
 	
 	public static final String VERSION = "0.0.1";
 	public static final String TITLE = "Gust";
+	public static final int V_WIDTH = 320;
+	public static final int V_HEIGHT = 240;
+	public static final int SCALE = 2;
 	
 	public static final float STEP = 1 / 60f;
 	private float accum;
