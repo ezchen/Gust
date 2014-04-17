@@ -2,8 +2,8 @@ package com.ezchen.Gust.states;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.ezchen.Gust.handlers.GameStateManager;
 import com.ezchen.Gust.Gust;
+import com.ezchen.Gust.handlers.GameStateManager;
 
 public abstract class GameState {
 	protected GameStateManager gsm;
@@ -25,4 +25,7 @@ public abstract class GameState {
 	public abstract void update(float dt);
 	public abstract void render();
 	public abstract void dispose();
+	public abstract void fling(float velocityX, float velocityY, int button);
+	
+	
 }
