@@ -2,6 +2,8 @@ package com.ezchen.Gust.states;
 
 import static com.ezchen.Gust.handlers.B2DVars.PPM;
 
+import java.util.LinkedList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,6 +19,8 @@ import com.ezchen.Gust.Gust;
 import com.ezchen.Gust.handlers.B2DVars;
 import com.ezchen.Gust.handlers.GameStateManager;
 import com.ezchen.Gust.handlers.MyContactListener;
+import com.ezchen.Gust.mapareas.MapArea;
+import com.ezchen.Gust.mapareas.PlatformArea;
 
 public class PlayState extends GameState {
 
@@ -24,15 +28,17 @@ public class PlayState extends GameState {
 	private OrthographicCamera b2dCam;
 	private Box2DDebugRenderer debugRenderer;
 	private Body playerBody;
+	private LinkedList<MapArea> areas;
 	
 	public PlayState(GameStateManager gsm) {
 		super(gsm);
+		areas = new LinkedList<MapArea>();
 		
-		world = new World(new Vector2(0, -5f), true);
+		world = new World(new Vector2(0, -9.81f), true);
 		world.setContactListener(new MyContactListener());
 		debugRenderer = new Box2DDebugRenderer();
 		
-		createPlatform();
+		areas.add(new PlatformArea(world, 160, 120));
 		
 		createPlayer();
 		
@@ -50,6 +56,23 @@ public class PlayState extends GameState {
 	@Override
 	public void update(float dt) {
 		world.step(dt, 6, 2);
+		
+		// move the camera with the player
+		b2dCam.position.x = playerBody.getPosition().x;
+		b2dCam.position.y = playerBody.getPosition().y;
+		b2dCam.update();
+		
+		// update the players velocity
+		if (playerBody.getLinearVelocity().x < 4) {
+			playerBody.applyLinearImpulse(.2f, 0, playerBody.getPosition().x, playerBody.getPosition().y,
+					false);
+		}
+		
+		// create new platforms
+		if (areas.peekLast() == null ||
+				(areas.peekLast().getPosition().x / PPM - playerBody.getPosition().x) < (Gust.V_WIDTH / PPM) * 3) {
+			areas.add(new PlatformArea(world, areas.peekLast().getPosition().x+150,areas.peekLast().getPosition().y));
+		}
 	}
 
 	@Override
@@ -95,7 +118,7 @@ public class PlayState extends GameState {
 		
 		playerBody.createFixture(fDef).setUserData("PlayerBody");
 		
-		shape.setAsBox(2 / PPM, 2 / PPM, new Vector2(0, -height / PPM), 0);
+		shape.setAsBox(width / PPM, 2 / PPM, new Vector2(0, -height / PPM), 0);
 		fDef.shape = shape;
 		fDef.isSensor = true;
 		
