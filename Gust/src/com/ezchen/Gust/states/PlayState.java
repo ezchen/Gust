@@ -71,7 +71,7 @@ public class PlayState extends GameState {
 		// create new platforms
 		if (areas.peekLast() == null ||
 				(areas.peekLast().getPosition().x / PPM - playerBody.getPosition().x) < (Gust.V_WIDTH / PPM) * 3) {
-			areas.add(new PlatformArea(world, areas.peekLast().getPosition().x+150,areas.peekLast().getPosition().y));
+			areas.add(new PlatformArea(world, areas.peekLast().getPosition().x+100,areas.peekLast().getPosition().y));
 		}
 	}
 
