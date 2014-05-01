@@ -12,6 +12,10 @@ public class MyContactListener implements ContactListener {
 	public void beginContact(Contact contact) {
 		Fixture fa = contact.getFixtureA();
 		Fixture fb = contact.getFixtureB();
+		
+		if (fa.getUserData().equals("Foot") || fb.getUserData().equals("Foot")) {
+			System.out.println("grounded");
+		}
 	}
 
 	@Override

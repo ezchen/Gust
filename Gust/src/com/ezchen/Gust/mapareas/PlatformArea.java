@@ -14,13 +14,20 @@ import com.ezchen.Gust.handlers.B2DVars;
 
 public class PlatformArea extends MapArea {
 	
+	// Box2d definitions will use half this width
 	public PlatformArea(World world, Vector2 position) {
 		super(world, position);
+		width = 200;
+		create(world, position.x + width/2, position.y);
 	}
 	
 	public PlatformArea(World world, float positionX, float positionY) {
 		super(world, positionX, positionY);
-		create(world, positionX, positionY);
+		
+		width = 200;
+		// We want to define MapArea's position as the bottom left corner but
+		// box2d bodies are defined using the center of the body
+		create(world, positionX + width/2, positionY);
 	}
 	
 	private void create(World world, float positionX, float positionY) {
@@ -34,15 +41,17 @@ public class PlatformArea extends MapArea {
 		
 		// create a shape so we can define a fixture
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(50 / PPM, 50 / PPM);
+		shape.setAsBox((width / 2) / PPM, 50 / PPM);
 		
 		// create the fixture
 		FixtureDef fDef = new FixtureDef();
 		fDef.shape = shape;
 		fDef.filter.categoryBits = B2DVars.BIT_GROUND;
-		fDef.filter.maskBits = B2DVars.BIT_PLAYER;
+		fDef.filter.maskBits = B2DVars.BIT_PLAYER | -1;
 		
 		body.createFixture(fDef).setUserData("Platform");
+		
+		shape.dispose();
 	}
 	
 	@Override

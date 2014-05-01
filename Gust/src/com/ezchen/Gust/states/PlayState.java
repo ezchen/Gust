@@ -3,6 +3,7 @@ package com.ezchen.Gust.states;
 import static com.ezchen.Gust.handlers.B2DVars.PPM;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
@@ -55,7 +56,7 @@ public class PlayState extends GameState {
 
 	@Override
 	public void update(float dt) {
-		world.step(dt, 6, 2);
+		world.step(dt, 1, 1);
 		
 		// move the camera with the player
 		b2dCam.position.x = playerBody.getPosition().x;
@@ -63,7 +64,7 @@ public class PlayState extends GameState {
 		b2dCam.update();
 		
 		// update the players velocity
-		if (playerBody.getLinearVelocity().x < 4) {
+		if (playerBody.getLinearVelocity().x < 2.5) {
 			playerBody.applyLinearImpulse(.2f, 0, playerBody.getPosition().x, playerBody.getPosition().y,
 					false);
 		}
@@ -71,7 +72,17 @@ public class PlayState extends GameState {
 		// create new platforms
 		if (areas.peekLast() == null ||
 				(areas.peekLast().getPosition().x / PPM - playerBody.getPosition().x) < (Gust.V_WIDTH / PPM) * 3) {
-			areas.add(new PlatformArea(world, areas.peekLast().getPosition().x+100,areas.peekLast().getPosition().y));
+			areas.add(new PlatformArea(world, areas.peekLast().getRightEdge() + 100,areas.peekLast().getPosition().y));
+			System.out.println(areas.peekLast().getRightEdge());
+		}
+		
+		// delete platforms
+		if (playerBody.getPosition().x - areas.peekFirst().getPosition().x / PPM > (Gust.V_WIDTH / PPM)) {
+			MapArea area = areas.removeFirst();
+			List<Body> bodies = area.getBodies();
+			for (Body body: bodies) {
+				world.destroyBody(body);
+			}
 		}
 	}
 
@@ -118,11 +129,13 @@ public class PlayState extends GameState {
 		
 		playerBody.createFixture(fDef).setUserData("PlayerBody");
 		
-		shape.setAsBox(width / PPM, 2 / PPM, new Vector2(0, -height / PPM), 0);
+		shape.setAsBox(width / 1.5f / PPM, 2 / PPM, new Vector2(0, -height / PPM), 0);
 		fDef.shape = shape;
 		fDef.isSensor = true;
 		
 		playerBody.createFixture(fDef).setUserData("Foot");
+		
+		shape.dispose();
 	}
 	
 	private void createPlatform() {
@@ -146,6 +159,8 @@ public class PlayState extends GameState {
 		fDef.filter.maskBits = B2DVars.BIT_PLAYER;
 		
 		body.createFixture(fDef).setUserData("Platform");
+		
+		shape.dispose();
 	}
 
 }

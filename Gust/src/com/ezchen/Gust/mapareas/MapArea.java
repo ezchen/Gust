@@ -14,12 +14,13 @@ public abstract class MapArea {
 	protected List<Body> bodies = new ArrayList<Body>();
 	protected World world;
 	
-	public MapArea(World world) {
-		this.world = world;
-	}
-	
+	// Box2d will use half of each of these definitions divided by PPM
+	protected int width;
+	protected int height;
+
 	protected MapArea(World world, Vector2 position) {
-		this.position = position;
+		this.world = world;
+		this.position = new Vector2(position);
 	}
 	
 	protected MapArea(World world, float positionX, float positionY) {
@@ -32,6 +33,30 @@ public abstract class MapArea {
 	
 	public Vector2 getPosition() {
 		return position;
+	}
+	
+	public float getLeftEdge() {
+		return position.x;
+	}
+	
+	public float getRightEdge() {
+		return position.x + width;
+	}
+	
+	public float getTopEdge() {
+		return position.y + height;
+	}
+	
+	public float getBottomEdge() {
+		return position.y;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
 	}
 	
 	protected abstract void update(float deltaTime);
